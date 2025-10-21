@@ -1,0 +1,5 @@
+import * as CONSTANT from "./constant";
+
+const SERVER_URL = import.meta.env.VITE_APP_SERVER_URL;
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+export { SERVER_URL, SOCKET_URL, CONSTANT };
