@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "nodemon ./server.ts",
     "start": "node --env-file=.env ./dist/server.js",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && npx prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

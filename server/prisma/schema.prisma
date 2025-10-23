@@ -6,7 +6,13 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/prisma"
+  output   = "../prisma-db"
+}
+
+// this will generate prisma client for the dist folder
+generator dist_client {
+  provider = "prisma-client-js"
+  output   = "../dist/prisma-db"
 }
 
 datasource db {

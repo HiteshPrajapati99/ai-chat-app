@@ -1,4 +1,4 @@
-import { PrismaClient } from "../prisma/generated/prisma";
+import { PrismaClient } from "../prisma-db";
 
 class PrismaService {
   client = new PrismaClient();

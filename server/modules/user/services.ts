@@ -1,4 +1,4 @@
-import { Prisma } from "../../prisma/generated/prisma/client";
+import { Prisma } from "../../prisma-db";
 import { db } from "../../services/prisma-service";
 
 class UserServices {
