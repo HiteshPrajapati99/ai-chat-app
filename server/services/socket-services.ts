@@ -24,7 +24,7 @@ class SocketService {
   constructor(server: Server) {
     this.io = new socketIO.Server(server, {
       pingTimeout: 60000, // 60s
-      cors: { origin: "*" },
+      cors: { origin: "*", credentials: true },
     });
 
     this.initialize();

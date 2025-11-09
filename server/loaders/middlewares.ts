@@ -28,7 +28,7 @@ class MiddlewaresLoader {
 
     app.use(
       cors({
-        origin: [config.FRONT_END_URL],
+        origin: "*",
         credentials: true,
       })
     );
