@@ -16,7 +16,6 @@ type SendMessageType = {
   ai_model?: string;
 };
 
-
 let connectedUsers: Record<string, string> = {}; // key user id and value is socket id
 
 class SocketService {
@@ -31,25 +30,25 @@ class SocketService {
     this.initialize();
   }
 
-  private  initialize() {
+  private initialize() {
     console.log("Socket service initialized");
     // use redis adapter
-    const pub = new Redis({
-      host : config.REDIS_HOST,
-      port  : Number(config.REDIS_PORT),
-      username : config.REDIS_USERNAME,
-      password : config.REDIS_PASSWORD,
-      maxRetriesPerRequest : 3,
-    });
-    const sub = pub.duplicate();
+    // const pub = new Redis({
+    //   host : config.REDIS_HOST,
+    //   port  : Number(config.REDIS_PORT),
+    //   username : config.REDIS_USERNAME,
+    //   password : config.REDIS_PASSWORD,
+    //   maxRetriesPerRequest : 3,
+    // });
+    // const sub = pub.duplicate();
 
-    pub.on("connect" , () => {
-      console.log("Redis connected");
-    })
-    pub.on("error", (err) => {
-      console.error("Redis error:", err);
-    })
-    this.io.adapter(createAdapter(pub, sub));
+    // pub.on("connect" , () => {
+    //   console.log("Redis connected");
+    // })
+    // pub.on("error", (err) => {
+    //   console.error("Redis error:", err);
+    // })
+    // this.io.adapter(createAdapter(pub, sub));
 
     this.io.on("connection", this.handleConnection.bind(this));
   }
@@ -116,38 +115,40 @@ class SocketService {
     const { message: receiveMessage, socket, user_id } = data;
     let chat_id = null;
     try {
-
       if (user_id === undefined || data === undefined) return;
       //  create chat if not exist
       let chat = null;
       let isCreateChatTitle = false;
-   
+
       if (receiveMessage.chat_id) {
-        chat_id = typeof receiveMessage.chat_id === "string" ? Number(receiveMessage.chat_id) : receiveMessage.chat_id;
+        chat_id =
+          typeof receiveMessage.chat_id === "string"
+            ? Number(receiveMessage.chat_id)
+            : receiveMessage.chat_id;
         const currChat = await db.chat.findFirst({
-          where : {
-            id : chat_id
+          where: {
+            id: chat_id,
           },
-          select : {
-            id : true,
-            title : true,
-          }
+          select: {
+            id: true,
+            title: true,
+          },
         });
         isCreateChatTitle = currChat?.title === null;
       } else {
         try {
-           chat = await ChatServices.createChat({
-           created_by: user_id,
+          chat = await ChatServices.createChat({
+            created_by: user_id,
           });
           chat_id = chat.id;
           // inform client that chat is created
-          socket.emit("chat:creating", { chat_id : chat_id });
+          socket.emit("chat:creating", { chat_id: chat_id });
         } catch (error) {
-           console.log("Error creating chat:" + error);
+          console.log("Error creating chat:" + error);
         }
       }
 
-      if(!chat_id) return;
+      if (!chat_id) return;
       let messageData = {
         content: receiveMessage.content,
         chat_id: chat_id,
@@ -155,19 +156,19 @@ class SocketService {
         type: "user",
       };
 
-      const newMessage  = await db.message.create({
+      const newMessage = await db.message.create({
         data: messageData,
-        select : {id : true}
+        select: { id: true },
       });
 
-      const newMessageData =  await ChatServices.getMessageByID(newMessage.id);
+      const newMessageData = await ChatServices.getMessageByID(newMessage.id);
 
       this.io
         .to(String(messageData.chat_id))
         .emit("message:received", newMessageData);
 
       // Generate a temp id for client to attach streaming chunks to a placeholder message
-       const tempId = `ai-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      const tempId = `ai-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
       this.io.to(String(messageData.chat_id)).emit("ai:started", {
         chatId: messageData.chat_id,
@@ -176,39 +177,35 @@ class SocketService {
       });
 
       //  Fire the streaming worker
-       try {
-         const {title : chatTitle} = await streamAndSaveAIReply({
-           io: this.io,
-           chatId: Number(messageData.chat_id),
-           prompt: receiveMessage.content, // as user message
-           tempId,
-           isCreateChatTitle : chat !== null || isCreateChatTitle,
-           model : receiveMessage.ai_model
-         })
-         if(chat){
-          socket.emit("chat:created", {...chat, title : chatTitle });
+      try {
+        const { title: chatTitle } = await streamAndSaveAIReply({
+          io: this.io,
+          chatId: Number(messageData.chat_id),
+          prompt: receiveMessage.content, // as user message
+          tempId,
+          isCreateChatTitle: chat !== null || isCreateChatTitle,
+          model: receiveMessage.ai_model,
+        });
+        if (chat) {
+          socket.emit("chat:created", { ...chat, title: chatTitle });
         }
-        if(isCreateChatTitle){
-          socket.emit("chat:updated", { chat_id, title : chatTitle });
+        if (isCreateChatTitle) {
+          socket.emit("chat:updated", { chat_id, title: chatTitle });
         }
-       } catch (error) {
-         if(chat){
-          socket.emit("chat:created",chat);
+      } catch (error) {
+        if (chat) {
+          socket.emit("chat:created", chat);
         }
-         console.log("Error streaming AI reply:" + error);
-       }
-
-    
+        console.log("Error streaming AI reply:" + error);
+      }
     } catch (error) {
       console.log("Error sending message to chat " + chat_id + ":" + error);
       socket.emit("message:error", {
         chatId: chat_id,
-        error: "Error sending message to chat "+ error,
+        error: "Error sending message to chat " + error,
       });
     }
   }
-
- 
 }
 
 export default SocketService;

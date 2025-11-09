@@ -12,6 +12,11 @@ class PrismaService {
       console.log("DB disconnected with error", error);
     }
   }
+
+  public async disconnect() {
+    await this.client.$disconnect();
+    console.log("DB disconnected!");
+  }
 }
 
 export const databaseService = new PrismaService();

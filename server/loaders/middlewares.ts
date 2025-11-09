@@ -4,6 +4,7 @@ import cors from "cors";
 import { config } from "../config";
 import compression from "compression";
 import cookieParser from "cookie-parser";
+import { databaseService } from "../services/prisma-service";
 
 /**
  * @description It plays an essential and key role to add middlewares. All request passes
@@ -21,6 +22,10 @@ class MiddlewaresLoader {
 
   static init(app: Express) {
     console.info("Loading application middlewares");
+
+    // connect db
+    databaseService.initialize();
+
     app.use(
       cors({
         origin: [config.FRONT_END_URL],

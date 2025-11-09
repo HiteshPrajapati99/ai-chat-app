@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./server.ts",
-    "start": "node --env-file=.env ./dist/server.js",
+    "dev": "nodemon ./app.ts",
+    "start": "node ./dist/app.js",
     "build": "tsc -p tsconfig.json && npx prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
