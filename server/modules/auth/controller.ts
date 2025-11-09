@@ -10,7 +10,7 @@ import bcrypt from "bcrypt";
 const cookieOptions: CookieOptions = {
   // domain: config.FRONT_END_URL,
   secure: config.NODE_ENV === "production",
-  maxAge: 24 * 60 * 60 * 1000,
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
   sameSite: "none",
   httpOnly: config.NODE_ENV === "production",
 };

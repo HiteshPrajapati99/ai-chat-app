@@ -27,7 +27,7 @@ const validation = z.object({
 type T_Form = z.infer<typeof validation>;
 
 const Login = () => {
-  const [cookies] = useCookies([AUTH_COOKIE]);
+  const [cookies, setCookies] = useCookies([AUTH_COOKIE]);
 
   const navigate = useNavigate();
 
@@ -43,7 +43,7 @@ const Login = () => {
 
     if (res.s) {
       toast.success(res.m);
-
+      setCookies(AUTH_COOKIE, res.r.token);
       navigate("/");
       return;
     }
