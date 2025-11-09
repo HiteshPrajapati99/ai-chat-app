@@ -32,6 +32,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [isPassword, setIsPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<T_Form>({
     mode: "all",
@@ -39,14 +40,18 @@ const Login = () => {
   });
 
   const handleSubmit = async (values: T_Form) => {
+    setIsLoading(true);
     const res = await login(values);
 
     if (res.s) {
       toast.success(res.m);
       setCookies(AUTH_COOKIE, res.r.token);
       navigate("/");
+      setIsLoading(false);
       return;
     }
+
+    setIsLoading(false);
 
     toast.error(res.m || "Oops! something went wrong. Please try again.");
   };
@@ -108,6 +113,7 @@ const Login = () => {
                 <Button
                   type="submit"
                   className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white transition-all hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500"
+                  isLoading={isLoading}
                 >
                   <span className="relative z-10">Sign In</span>
                   <div className="absolute inset-0 scale-x-0 bg-gradient-to-r from-purple-600 to-blue-600 transition-transform hover:scale-x-100 dark:from-purple-500 dark:to-blue-500" />

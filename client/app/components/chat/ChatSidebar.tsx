@@ -9,11 +9,15 @@ import { LogOut, MessageCircle, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import Modal from "../common/Modal";
+import { AUTH_COOKIE } from "@/config/constant";
+import { useCookies } from "react-cookie";
 
 export default function ChatSidebar() {
   const { user, setUser } = useUser();
   const socket = useSocket();
   const client = useQueryClient();
+  const [, , removeCookie] = useCookies([AUTH_COOKIE]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isLogOutModal, setIsLogOutModal] = useState(false);
@@ -78,8 +82,11 @@ export default function ChatSidebar() {
   };
 
   const handleLogOut = async () => {
+    setIsLoading(true);
     await logout();
+    removeCookie(AUTH_COOKIE);
     setUser(null);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -202,7 +209,11 @@ export default function ChatSidebar() {
           >
             Cancel
           </Button>
-          <Button onClick={handleLogOut} className="px-10">
+          <Button
+            onClick={handleLogOut}
+            className="px-10"
+            isLoading={isLoading}
+          >
             Logout
           </Button>
         </div>
