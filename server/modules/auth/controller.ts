@@ -1,3 +1,4 @@
+import { CookieOptions } from "express";
 import { config } from "../../config";
 import { resHandler, asyncHandler } from "../../helpers";
 import { errorMessages, successMessages } from "../../lang/messages";
@@ -6,13 +7,13 @@ import userService from "../user/services";
 import { User } from "./schema";
 import bcrypt from "bcrypt";
 
-const cookieOptions = {
+const cookieOptions: CookieOptions = {
   // domain: config.FRONT_END_URL,
   secure: config.NODE_ENV === "production",
   maxAge: 24 * 60 * 60 * 1000,
-  sameSite: "strict",
+  sameSite: "none",
   httpOnly: config.NODE_ENV === "production",
-} as const;
+};
 
 class AuthController {
   static register = asyncHandler(async (req, res) => {

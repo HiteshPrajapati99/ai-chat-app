@@ -23,17 +23,17 @@ export default function Protected() {
 
   return (
     <main className="h-screen flex flex-col bg-gray-50 dark:bg-background">
-     <div className="flex flex-1 overflow-hidden">
-          {/* Chat Sidebar */}
-          <div className="w-64 bg-white dark:bg-gray-950 flex-shrink-0 overflow-y-auto">
-            <ChatSidebar />
-          </div>
-          
-          {/* Main Chat Area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <Outlet />
-          </div>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Chat Sidebar */}
+        <div className="w-64 bg-white dark:bg-gray-950 flex-shrink-0 overflow-y-auto">
+          <ChatSidebar />
         </div>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Outlet />
+        </div>
+      </div>
     </main>
   );
 }
